@@ -2,12 +2,12 @@ version: '3'
 services:
     web:
         container_name: phpdevbox_web
-        image: hectorrojas/phpdevbox:7.1
+        image: hectorrojas/phpdevbox:7.1.24-fpm
         volumes:
           - "~/.composer:/home/phpdevbox/.composer"
           - "~/.ssh:/home/phpdevbox/.ssh"
-          - "./shared/logs/apache2:/var/log/apache2"
-          - ./shared/webroot:/var/www/html:consistent
+          - "./shared/log/apache2:/var/log/apache2"
+          - ./shared/webroot:/var/www/phpdevbox:consistent
         expose:
           - "9000"
         ports:
@@ -25,4 +25,4 @@ services:
           - MYSQL_DATABASE=mysql
         volumes:
           - "./shared/db:/var/lib/mysql"
-          - "./shared/var/logs/mysql:/var/log/mysql"
+          - "./shared/log/mysql:/var/log/mysql"
