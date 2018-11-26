@@ -1,0 +1,28 @@
+version: '3'
+services:
+    web:
+        container_name: phpdevbox_web
+        image: hectorrojas/phpdevbox:7.1
+        volumes:
+          - "~/.composer:/home/phpdevbox/.composer"
+          - "~/.ssh:/home/phpdevbox/.ssh"
+          - "./shared/logs/apache2:/var/log/apache2"
+          - ./shared/webroot:/var/www/html:consistent
+        expose:
+          - "9000"
+        ports:
+          - "80:80"
+          - "443:443"
+          - "4022:22"
+
+    db:
+        container_name: phpdevbox_db
+        image: mysql:5.7
+        ports:
+          - "3306:3306"
+        environment:
+          - MYSQL_ROOT_PASSWORD=root
+          - MYSQL_DATABASE=mysql
+        volumes:
+          - "./shared/db:/var/lib/mysql"
+          - "./shared/var/logs/mysql:/var/log/mysql"
