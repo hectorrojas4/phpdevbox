@@ -1,4 +1,4 @@
-FROM php:7.1.24-fpm
+FROM php:5.6.39-fpm
 
 MAINTAINER "Hector Rojas"
 
@@ -34,7 +34,7 @@ RUN docker-php-ext-configure gd --with-freetype-dir=/usr/include/ --with-jpeg-di
     && docker-php-ext-configure hash --with-mhash \
     && docker-php-ext-install -j$(nproc) bcmath gd intl json mbstring mcrypt opcache pdo_mysql soap xsl zip iconv \
     && curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer \
-    && pecl install xdebug && docker-php-ext-enable xdebug \
+    && pecl install xdebug-2.5.5 && docker-php-ext-enable xdebug \
     && echo "xdebug.remote_enable=1" >> /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini \
     && echo "xdebug.remote_port=9000" >> /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini \
     && echo "xdebug.remote_connect_back=0" >> /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini \
