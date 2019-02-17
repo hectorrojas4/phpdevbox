@@ -83,7 +83,7 @@ ADD conf/entrypoint.sh /usr/local/bin/entrypoint.sh
 RUN chmod +x /usr/local/bin/entrypoint.sh
 
 RUN chown -R phpdevbox:phpdevbox /home/phpdevbox \
-    && chown -R phpdevbox:phpdevbox /var/www/phpdevbox
+    && chown -R phpdevbox:phpdevbox /var/www/phpdevbox \
     && chown -R phpdevbox:phpdevbox /var/www/phpdevbox/public
 
 EXPOSE 80 22 443 5000 9000 44100
