@@ -1,5 +1,5 @@
 # phpdevbox
-PHP development environment using Docker with Debian and PHP 7.1.24-fpm
+PHP development environment for Zend Framework using Docker with Debian and PHP 7.1.24-fpm
 
 ## SSH to Docker Container
 To access to the docker container using ssh you can add a loopback alias:

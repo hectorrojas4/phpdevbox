@@ -56,6 +56,7 @@ RUN docker-php-ext-configure gd --with-freetype-dir=/usr/include/ --with-jpeg-di
     && touch /etc/sudoers.d/privacy \
     && echo "Defaults        lecture = never" >> /etc/sudoers.d/privacy \
     && mkdir /var/www/phpdevbox \
+    && mkdir /var/www/phpdevbox/public \
     && sed -i 's/PermitRootLogin prohibit-password/PermitRootLogin yes/' /etc/ssh/sshd_config \
     && sed 's@session\s*required\s*pam_loginuid.so@session optional pam_loginuid.so@g' -i /etc/pam.d/sshd \
     && rm -r /usr/local/etc/php-fpm.d/* \
@@ -82,7 +83,8 @@ ADD conf/entrypoint.sh /usr/local/bin/entrypoint.sh
 RUN chmod +x /usr/local/bin/entrypoint.sh
 
 RUN chown -R phpdevbox:phpdevbox /home/phpdevbox \
-    && chown -R phpdevbox:phpdevbox /var/www/phpdevbox
+    && chown -R phpdevbox:phpdevbox /var/www/phpdevbox \
+    && chown -R phpdevbox:phpdevbox /var/www/phpdevbox/public
 
 EXPOSE 80 22 443 5000 9000 44100
 WORKDIR /home/phpdevbox
