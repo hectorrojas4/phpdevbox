@@ -3,19 +3,23 @@ PHP development environment using Docker with Debian and PHP 7.1.24-fpm
 
 ## SSH to Docker Container
 To access to the docker container using ssh you can add a loopback alias:
-#### Mac
+
+### Mac
 ```
 sudo ifconfig lo0 alias 10.254.254.254 255.255.255.0
 ```
 
-#### Linux
+### Linux
 ```
 sudo ifconfig lo:0 10.254.254.254 netmask 255.255.255.0 up
+```
 
 ### To access the application container:
 ```
 ssh -p 4022 -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -t phpdevbox@10.254.254.254 "cd /var/www/phpdevbox; bash"
 ```
+
+## Docker Credentials
 User: `phpdevbox`
 Password: `phpdevbox`
 
@@ -25,3 +29,9 @@ Password: `phpdevbox`
 mysql -h 10.254.254.254 -u"root" -p"root"
 ```
 
+#### Settrings for MySQL Workbench
+Hostname: `10.254.254.254`
+Port: `3306`
+Username: `root`
+Password: `root`
+** To access using IP 10.254.254.254 you must add a loopback alias using the command shown above**
