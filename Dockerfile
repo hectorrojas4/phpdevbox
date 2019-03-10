@@ -1,4 +1,4 @@
-FROM php:7.1.24-fpm
+FROM php:7.1.27-fpm
 
 MAINTAINER "Hector Rojas"
 
@@ -32,7 +32,7 @@ RUN apt-get update && apt-get install -y \
 
 RUN docker-php-ext-configure gd --with-freetype-dir=/usr/include/ --with-jpeg-dir=/usr/include/ \
     && docker-php-ext-configure hash --with-mhash \
-    && docker-php-ext-install -j$(nproc) bcmath gd intl json mbstring mcrypt opcache pdo_mysql soap xsl zip iconv \
+    && docker-php-ext-install -j$(nproc) bcmath gd intl json mbstring mcrypt opcache mysqli pdo pdo_mysql soap xsl zip iconv xml xmlrpc \
     && curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer \
     && pecl install xdebug && docker-php-ext-enable xdebug \
     && echo "xdebug.remote_enable=1" >> /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini \
