@@ -2,7 +2,7 @@ version: '3'
 services:
     web:
         container_name: phpdevbox_web
-        image: hectorrojas/phpdevbox:7.1.24-fpm
+        image: hectorrojas/phpdevbox:7.1-fpm
         volumes:
           - "~/.composer:/home/phpdevbox/.composer"
           - "~/.ssh:/home/phpdevbox/.ssh"
