@@ -6,7 +6,7 @@ services:
         volumes:
           - "~/.composer:/home/phpdevbox/.composer"
           - "~/.ssh:/home/phpdevbox/.ssh"
-          - "./shared/log/apache2:/var/log/apache2"
+          - ./shared/log/apache2:/var/log/apache2:cached
           - ./shared/webroot:/var/www/phpdevbox:consistent
         expose:
           - "9000"
@@ -24,5 +24,5 @@ services:
           - MYSQL_ROOT_PASSWORD=root
           - MYSQL_DATABASE=mysql
         volumes:
-          - "./shared/db:/var/lib/mysql"
-          - "./shared/log/mysql:/var/log/mysql"
+          - ./shared/db:/var/lib/mysql:cached
+          - ./shared/log/mysql:/var/log/mysql:cached
