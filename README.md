@@ -17,11 +17,11 @@ Password: `phpdevbox`
 
 ### To access the mysql console:
 ```
-mysql -h localhost -u"root" -p"root"
+mysql -h 127.0.0.1 -P 3306 -u"root" -p"root"
 ```
 
 #### Settrings for MySQL Workbench
-Hostname: `localhost`
+Hostname: `127.0.0.1`
 Port: `3306`
 Username: `root`
 Password: `root`
