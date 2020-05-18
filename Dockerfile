@@ -20,7 +20,8 @@ RUN apt-get update && apt-get install -y \
     sendmail-bin \
     openssh-server \
     supervisor \
-    mysql-client \
+    mariadb-client \
+    default-mysql-client \
     ocaml \
     expect \
     libmcrypt-dev \
@@ -28,7 +29,12 @@ RUN apt-get update && apt-get install -y \
     libxml2-dev libxslt1-dev \
     libfreetype6-dev \
     libjpeg62-turbo-dev \
-    libpng-dev
+    libpng-dev \
+    mailutils \
+    dnsutils \
+    redis-server \
+    iputils-ping \
+    libzip-dev
 
 RUN docker-php-ext-configure gd --with-freetype-dir=/usr/include/ --with-jpeg-dir=/usr/include/ \
     && docker-php-ext-configure hash --with-mhash \
@@ -54,6 +60,23 @@ RUN docker-php-ext-configure gd --with-freetype-dir=/usr/include/ --with-jpeg-di
     && sed 's@session\s*required\s*pam_loginuid.so@session optional pam_loginuid.so@g' -i /etc/pam.d/sshd \
     && rm -r /usr/local/etc/php-fpm.d/* \
     && sed -i 's/www-data/phpdevbox/g' /etc/apache2/envvars
+
+RUN curl -sL https://deb.nodesource.com/setup_14.x | sudo -E bash - \
+    && apt-get install -y nodejs \
+    && npm install npm@latest -g
+
+# Install and configure Postfix
+RUN debconf-set-selections <<< "postfix postfix/mailname string mail.example.com"
+RUN debconf-set-selections <<< "postfix postfix/main_mailer_type string 'Internet Site'"
+RUN DEBIAN_FRONTEND=noninteractive apt-get install -y --assume-yes postfix
+RUN postconf -e myhostname=mail.example.com
+RUN postconf -e mydestination="mail.example.com, example.com, localhost.localdomain, localhost"
+RUN postconf -e mail_spool_directory="/var/spool/mail/"
+RUN postconf -e mailbox_command=""
+
+# SSL certificate
+RUN mkdir /etc/apache2/ssl \
+    && openssl req -x509 -nodes -days 365 -newkey rsa:2048 -keyout /etc/apache2/ssl/apache.key -out /etc/apache2/ssl/apache.crt -subj "/C=US/ST=New York/L=New York/O=PHPDEVBOX/CN=PHPDEVBOX"
 
 # PHP config
 ADD conf/php.ini /usr/local/etc/php

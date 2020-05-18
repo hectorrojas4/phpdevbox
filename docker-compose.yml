@@ -6,7 +6,8 @@ services:
     volumes:
       - "~/.composer:/home/phpdevbox/.composer"
       - "~/.ssh:/home/phpdevbox/.ssh"
-      - ./apache/log/apache2:/var/log/apache2:cached
+      - ./var/log/apache2:/var/log/apache2:cached
+      - ./var/spool/mail:/var/spool/mail/:cached
       - ./webroot:/var/www/phpdevbox:consistent
     expose:
       - "9000"
