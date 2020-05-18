@@ -1,28 +1,31 @@
 version: '3'
 services:
-    web:
-        container_name: phpdevbox_web
-        image: hectorrojas/phpdevbox:7.1-fpm
-        volumes:
-          - "~/.composer:/home/phpdevbox/.composer"
-          - "~/.ssh:/home/phpdevbox/.ssh"
-          - ./shared/log/apache2:/var/log/apache2:cached
-          - ./shared/webroot:/var/www/phpdevbox:consistent
-        expose:
-          - "9000"
-        ports:
-          - "80:80"
-          - "443:443"
-          - "4022:22"
+  web:
+    container_name: phpdevbox_web
+    image: hectorrojas/phpdevbox:7.3-fpm
+    volumes:
+      - "~/.composer:/home/phpdevbox/.composer"
+      - "~/.ssh:/home/phpdevbox/.ssh"
+      - ./apache/log/apache2:/var/log/apache2:cached
+      - ./webroot:/var/www/phpdevbox:consistent
+    expose:
+      - "9000"
+    ports:
+      - "80:80"
+      - "443:443"
+      - "4022:22"
+  db:
+    container_name: phpdevbox_db
+    image: mariadb:10.2
+    volumes:
+      - ./db/var/lib/mysql:/var/lib/mysql:cached
+    environment:
+      - MYSQL_ROOT_PASSWORD=phpdevbox
+      - MYSQL_DATABASE=phpdevbox
+      - MYSQL_USER=phpdevbox
+      - MYSQL_PASSWORD=phpdevbox
+    ports:
+      - "3306:3306"
+  elasticsearch:
+    image: hectorrojas/elasticsearch:6.5
 
-    db:
-        container_name: phpdevbox_db
-        image: mysql:5.7
-        ports:
-          - "3306:3306"
-        environment:
-          - MYSQL_ROOT_PASSWORD=root
-          - MYSQL_DATABASE=mysql
-        volumes:
-          - ./shared/db:/var/lib/mysql:cached
-          - ./shared/log/mysql:/var/log/mysql:cached
