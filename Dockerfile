@@ -6,6 +6,10 @@ ARG DEBIAN_FRONTEND=noninteractive
 
 ENV PHP_EXTRA_CONFIGURE_ARGS="--enable-fpm --with-fpm-user=phpdevbox --with-fpm-group=phpdevbox"
 
+ENV PHP_MEMORY_LIMIT 2G
+ENV UPLOAD_MAX_FILESIZE 64M
+ENV APP_ROOT /app
+
 RUN apt-get update && apt-get install -y \
     apt-utils \
     sudo \
@@ -36,9 +40,14 @@ RUN apt-get update && apt-get install -y \
     iputils-ping \
     libzip-dev
 
+RUN apt-get update && apt-get install -y libmagickwand-6.q16-dev --no-install-recommends \
+	&& ln -s /usr/lib/x86_64-linux-gnu/ImageMagick-6.9.10/bin-q16/MagickWand-config /usr/bin \
+	&& pecl install imagick \
+	&& echo "extension=imagick.so" > /usr/local/etc/php/conf.d/ext-imagick.ini
+
 RUN docker-php-ext-configure gd --with-freetype-dir=/usr/include/ --with-jpeg-dir=/usr/include/ \
     && docker-php-ext-configure hash --with-mhash \
-    && docker-php-ext-install -j$(nproc) bcmath gd intl json mbstring mcrypt opcache mysqli pdo pdo_mysql soap xsl zip iconv xml xmlrpc \
+    && docker-php-ext-install -j$(nproc) bcmath gd intl json mbstring opcache mysqli pdo pdo_mysql simplexml soap xsl zip iconv xml xmlrpc \
     && curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer \
     && pecl install xdebug && docker-php-ext-enable xdebug \
     && chmod 666 /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini \
@@ -55,24 +64,29 @@ RUN docker-php-ext-configure gd --with-freetype-dir=/usr/include/ --with-jpeg-di
     && echo "phpdevbox:phpdevbox" | chpasswd \
     && touch /etc/sudoers.d/privacy \
     && echo "Defaults        lecture = never" >> /etc/sudoers.d/privacy \
-    && mkdir /var/www/phpdevbox \
     && sed -i 's/PermitRootLogin prohibit-password/PermitRootLogin yes/' /etc/ssh/sshd_config \
     && sed 's@session\s*required\s*pam_loginuid.so@session optional pam_loginuid.so@g' -i /etc/pam.d/sshd \
     && rm -r /usr/local/etc/php-fpm.d/* \
     && sed -i 's/www-data/phpdevbox/g' /etc/apache2/envvars
 
+RUN mkdir -p ${APP_ROOT} \
+    && chown -R phpdevbox:phpdevbox /home/phpdevbox \
+    && chown -R phpdevbox:phpdevbox ${APP_ROOT}
+
 RUN curl -sL https://deb.nodesource.com/setup_14.x | sudo -E bash - \
     && apt-get install -y nodejs \
-    && npm install npm@latest -g
+    && npm update -g npm \
+    && npm install npm@latest -g \
+    && npm install -g grunt-cli && npm install -g gulp-cli
 
 # Install and configure Postfix
-RUN debconf-set-selections <<< "postfix postfix/mailname string mail.example.com"
-RUN debconf-set-selections <<< "postfix postfix/main_mailer_type string 'Internet Site'"
-RUN DEBIAN_FRONTEND=noninteractive apt-get install -y --assume-yes postfix
-RUN postconf -e myhostname=mail.example.com
-RUN postconf -e mydestination="mail.example.com, example.com, localhost.localdomain, localhost"
-RUN postconf -e mail_spool_directory="/var/spool/mail/"
-RUN postconf -e mailbox_command=""
+RUN echo "postfix postfix/mailname string mail.example.com" | debconf-set-selections \
+    && echo "postfix postfix/main_mailer_type string 'Internet Site'" | debconf-set-selections \
+    && apt-get install --assume-yes postfix \
+    && postconf -e myhostname=mail.example.com \
+    && postconf -e mydestination="mail.example.com, example.com, localhost.localdomain, localhost" \
+    && postconf -e mail_spool_directory="/var/spool/mail/" \
+    && postconf -e mailbox_command=""
 
 # SSL certificate
 RUN mkdir /etc/apache2/ssl \
@@ -101,10 +115,8 @@ ADD conf/apache-default.conf /etc/apache2/sites-enabled/apache-default.conf
 ADD conf/entrypoint.sh /usr/local/bin/entrypoint.sh
 RUN chmod +x /usr/local/bin/entrypoint.sh
 
-RUN chown -R phpdevbox:phpdevbox /home/phpdevbox \
-    && chown -R phpdevbox:phpdevbox /var/www/phpdevbox
-
 EXPOSE 80 22 443 5000 9000 44100
+
 WORKDIR /home/phpdevbox
 
 USER root

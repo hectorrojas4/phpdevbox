@@ -9,5 +9,5 @@ mutagen create \
        --ignore=/.github \
        --ignore-vcs \
        --symlink-mode=posix-raw \
-       ./webroot docker://$(docker ps | grep web | awk "{print \$1}")/var/www/phpdevbox
+       ./webroot docker://$(docker ps | grep web | awk "{print \$1}")/app
 
