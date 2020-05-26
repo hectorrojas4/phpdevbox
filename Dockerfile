@@ -1,4 +1,4 @@
-FROM php:7.3-fpm
+FROM php:7.3-fpm-stretch
 
 MAINTAINER "Hector Rojas"
 
@@ -9,51 +9,140 @@ ENV PHP_EXTRA_CONFIGURE_ARGS="--enable-fpm --with-fpm-user=phpdevbox --with-fpm-
 ENV PHP_MEMORY_LIMIT 2G
 ENV UPLOAD_MAX_FILESIZE 64M
 ENV APP_ROOT /app
+ENV PHP_EXTENSIONS bcmath bz2 calendar exif gd gettext intl mysqli opcache pdo_mysql redis soap sockets sysvmsg sysvsem sysvshm xsl zip pcntl
 
-RUN apt-get update && apt-get install -y \
+# Dependencies
+RUN apt-get update && apt-get upgrade -y && apt-get install -y --no-install-recommends \
     apt-utils \
     sudo \
     nano \
     vim \
-    curl \
     wget \
+    zip \
     unzip \
     bzip2 \
     cron \
     git \
+    apache2 \
     sendmail-bin \
+    sendmail \
+    mailutils \
+    dnsutils \
     openssh-server \
     supervisor \
     mariadb-client \
     default-mysql-client \
     ocaml \
     expect \
-    libmcrypt-dev \
-    libicu-dev \
-    libxml2-dev libxslt1-dev \
-    libfreetype6-dev \
+    libbz2-dev \
     libjpeg62-turbo-dev \
     libpng-dev \
-    mailutils \
-    dnsutils \
-    redis-server \
-    iputils-ping \
-    libzip-dev
+    libfreetype6-dev \
+    libgeoip-dev \
+    libgmp-dev \
+    libmagickwand-dev \
+    libmagickcore-dev \
+    libc-client-dev \
+    libkrb5-dev \
+    libicu-dev \
+    libldap2-dev \
+    libpspell-dev \
+    librecode0 \
+    librecode-dev \
+    libtidy-dev \
+    libxslt1-dev \
+    libyaml-dev \
+    libzip-dev \
+    libmcrypt-dev \
+    libxml2-dev \
+    iputils-ping
+RUN rm -rf /var/lib/apt/lists/*
 
-RUN apt-get update && apt-get install -y libmagickwand-6.q16-dev --no-install-recommends \
-	&& ln -s /usr/lib/x86_64-linux-gnu/ImageMagick-6.9.10/bin-q16/MagickWand-config /usr/bin \
-	&& pecl install imagick \
-	&& echo "extension=imagick.so" > /usr/local/etc/php/conf.d/ext-imagick.ini
+RUN pecl install -o -f geoip-1.1.1 \
+    igbinary \
+    imagick \
+    mailparse \
+    msgpack \
+    oauth \
+    propro \
+    raphf \
+    redis \
+    xdebug-2.7.1 \
+    yaml
 
-RUN docker-php-ext-configure gd --with-freetype-dir=/usr/include/ --with-jpeg-dir=/usr/include/ \
-    && docker-php-ext-configure hash --with-mhash \
-    && docker-php-ext-install -j$(nproc) bcmath gd intl json mbstring opcache mysqli pdo pdo_mysql simplexml soap xsl zip iconv xml xmlrpc \
-    && curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer \
-    && pecl install xdebug && docker-php-ext-enable xdebug \
-    && chmod 666 /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini \
+
+# PHP extension Sodium
+RUN rm -f /usr/local/etc/php/conf.d/*sodium.ini \
+  && rm -f /usr/local/lib/php/extensions/*/*sodium.so \
+  && apt-get remove libsodium* -y  \
+  && mkdir -p /tmp/libsodium  \
+  && curl -sL https://github.com/jedisct1/libsodium/archive/1.0.18-RELEASE.tar.gz | tar xzf - -C  /tmp/libsodium \
+  && cd /tmp/libsodium/libsodium-1.0.18-RELEASE/ \
+  && ./configure \
+  && make && make check \
+  && make install  \
+  && cd / \
+  && rm -rf /tmp/libsodium  \
+  && pecl install -o -f libsodium
+
+# Configure gd
+RUN docker-php-ext-configure gd --with-freetype-dir=/usr/include/ --with-jpeg-dir=/usr/include/
+RUN docker-php-ext-configure imap --with-kerberos --with-imap-ssl
+RUN docker-php-ext-configure ldap --with-libdir=lib/x86_64-linux-gnu
+RUN docker-php-ext-configure opcache --enable-opcache
+RUN docker-php-ext-configure zip --with-libzip
+RUN docker-php-ext-configure hash --with-mhash
+
+# PHP extensions
+RUN docker-php-ext-install -j$(nproc) bcmath bz2 calendar exif gd gettext gmp iconv imap intl json ldap mysqli mbstring opcache pcntl pdo pdo_mysql pspell recode \
+    shmop simplexml soap sockets sysvmsg sysvsem sysvshm tidy xml xmlrpc xsl zip
+
+RUN docker-php-ext-enable \
+    bcmath \
+    bz2 \
+    calendar \
+    exif \
+    gd \
+    geoip \
+    gettext \
+    gmp \
+    igbinary \
+    imagick \
+    imap \
+    intl \
+    ldap \
+    mailparse \
+    msgpack \
+    mysqli \
+    oauth \
+    opcache \
+    pcntl \
+    pdo_mysql \
+    propro \
+    pspell \
+    raphf \
+    recode \
+    redis \
+    shmop \
+    soap \
+    sockets \
+    sodium \
+    sysvmsg \
+    sysvsem \
+    sysvshm \
+    tidy \
+    xdebug \
+    xmlrpc \
+    xsl \
+    yaml \
+    zip
+
+# Install composer
+RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
+
+RUN chmod 666 /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini \
     && mkdir /var/run/sshd \
     && echo "StrictHostKeyChecking no" >> /etc/ssh/ssh_config \
-    && apt-get install -y apache2 \
     && a2enmod rewrite \
     && a2enmod proxy \
     && a2enmod proxy_fcgi \
@@ -67,9 +156,8 @@ RUN docker-php-ext-configure gd --with-freetype-dir=/usr/include/ --with-jpeg-di
     && sed -i 's/PermitRootLogin prohibit-password/PermitRootLogin yes/' /etc/ssh/sshd_config \
     && sed 's@session\s*required\s*pam_loginuid.so@session optional pam_loginuid.so@g' -i /etc/pam.d/sshd \
     && rm -r /usr/local/etc/php-fpm.d/* \
-    && sed -i 's/www-data/phpdevbox/g' /etc/apache2/envvars
-
-RUN mkdir -p ${APP_ROOT} \
+    && sed -i 's/www-data/phpdevbox/g' /etc/apache2/envvars \
+    && mkdir -p ${APP_ROOT} \
     && chown -R phpdevbox:phpdevbox /home/phpdevbox \
     && chown -R phpdevbox:phpdevbox ${APP_ROOT}
 

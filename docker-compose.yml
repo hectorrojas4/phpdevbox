@@ -7,7 +7,7 @@ services:
       - "~/.ssh:/home/phpdevbox/.ssh"
       - ./var/log/apache2:/var/log/apache2:cached
       - ./var/spool/mail:/var/spool/mail/:cached
-      - ./webroot:/var/www/phpdevbox:consistent
+      - ./webroot:/app:consistent
     expose:
       - "9000"
     ports:
@@ -20,10 +20,12 @@ services:
   generic:
     image: alpine
     environment:
-      - PHP_MEMORY_LIMIT=4096M
+      - PHP_MEMORY_LIMIT=4G
       - UPLOAD_MAX_FILESIZE=64M
       - APP_ROOT=/app
+      - PHP_IDE_CONFIG=serverName=phpdevbox
       - XDEBUG_CONFIG=remote_host=host.docker.internal
+      - 'PHP_EXTENSIONS=bcmath bz2 calendar exif gd gettext intl mysqli pcntl pdo_mysql soap sockets sysvmsg sysvsem sysvshm opcache zip redis xsl sodium xdebug'
   db:
     image: mariadb:10.2
     volumes:
@@ -37,4 +39,9 @@ services:
       - "3306:3306"
   elasticsearch:
     image: hectorrojas/elasticsearch:6.5
+    environment:
+      ES_JAVA_OPTS: "-Xms750m -Xmx750m"
+    ports:
+          - "9200:9200"
+          - "9300:9300"
 
