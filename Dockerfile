@@ -70,7 +70,6 @@ RUN pecl install -o -f geoip-1.1.1 \
     xdebug-2.7.1 \
     yaml
 
-
 # PHP extension Sodium
 RUN rm -f /usr/local/etc/php/conf.d/*sodium.ini \
   && rm -f /usr/local/lib/php/extensions/*/*sodium.so \

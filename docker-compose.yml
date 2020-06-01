@@ -23,8 +23,6 @@ services:
       - PHP_MEMORY_LIMIT=4G
       - UPLOAD_MAX_FILESIZE=64M
       - APP_ROOT=/app
-      - PHP_IDE_CONFIG=serverName=phpdevbox
-      - XDEBUG_CONFIG=remote_host=host.docker.internal
       - 'PHP_EXTENSIONS=bcmath bz2 calendar exif gd gettext intl mysqli pcntl pdo_mysql soap sockets sysvmsg sysvsem sysvshm opcache zip redis xsl sodium xdebug'
   db:
     image: mariadb:10.2
@@ -44,4 +42,3 @@ services:
     ports:
           - "9200:9200"
           - "9300:9300"
-
