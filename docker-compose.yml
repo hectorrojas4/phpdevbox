@@ -4,9 +4,7 @@ services:
     image: hectorrojas/phpdevbox:7.3-fpm
     volumes:
       - "~/.composer:/home/phpdevbox/.composer"
-      - "~/.ssh:/home/phpdevbox/.ssh"
       - ./var/log/apache2:/var/log/apache2:cached
-      - ./var/spool/mail:/var/spool/mail/:cached
       - ./webroot:/app:consistent
     expose:
       - "9000"
@@ -20,9 +18,16 @@ services:
   generic:
     image: alpine
     environment:
-      - PHP_MEMORY_LIMIT=4G
-      - UPLOAD_MAX_FILESIZE=64M
       - APP_ROOT=/app
+      - PHP_MEMORY_LIMIT=4G
+      - MAX_EXECUTION_TIME=18000
+      - UPLOAD_MAX_FILESIZE=64M
+      - POST_MAX_SIZE=64M
+      - GC_MAXLIFETIME=7200
+      - LOG_ERRORS=1
+      - PHP_IDE_CONFIG=serverName=phpdevbox_docker
+      - XDEBUG_CONFIG=remote_host=host.docker.internal
+      - ENABLE_SENDMAIL=true
       - 'PHP_EXTENSIONS=bcmath bz2 calendar exif gd gettext intl mysqli pcntl pdo_mysql soap sockets sysvmsg sysvsem sysvshm opcache zip redis xsl sodium xdebug'
   db:
     image: mariadb:10.2
