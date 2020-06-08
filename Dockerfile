@@ -30,8 +30,6 @@ RUN apt-get update && apt-get upgrade -y && apt-get install -y --no-install-reco
     apache2 \
     sendmail-bin \
     sendmail \
-    openssh-server \
-    supervisor \
     mariadb-client \
     default-mysql-client \
     libbz2-dev \
@@ -170,9 +168,7 @@ RUN docker-php-ext-enable \
 # Install composer
 RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
 
-RUN mkdir /var/run/sshd \
-    && echo "StrictHostKeyChecking no" >> /etc/ssh/ssh_config \
-    && a2enmod rewrite \
+RUN a2enmod rewrite \
     && a2enmod proxy \
     && a2enmod proxy_fcgi \
     && a2enmod headers \
@@ -181,10 +177,6 @@ RUN mkdir /var/run/sshd \
     && useradd -m -d /home/phpdevbox -s /bin/bash phpdevbox && adduser phpdevbox sudo \
     && echo "phpdevbox:phpdevbox" | chpasswd \
     && touch /etc/sudoers.d/privacy \
-    && echo "Defaults        lecture = never" >> /etc/sudoers.d/privacy \
-    && sed -i 's/PermitRootLogin prohibit-password/PermitRootLogin yes/' /etc/ssh/sshd_config \
-    && sed 's@session\s*required\s*pam_loginuid.so@session optional pam_loginuid.so@g' -i /etc/pam.d/sshd \
-    && rm -r /usr/local/etc/php-fpm.d/* \
     && sed -i 's/www-data/phpdevbox/g' /etc/apache2/envvars \
     && mkdir -p ${APP_ROOT} \
     && chown -R phpdevbox:phpdevbox ${APP_ROOT} \
@@ -209,13 +201,6 @@ COPY conf/xdebug.ini /usr/local/etc/php/conf.d/xdebug-config.ini
 # Mail config
 COPY conf/mail.ini /usr/local/etc/php/conf.d/mail-config.ini
 
-# SSH config
-COPY conf/sshd_config /etc/ssh/sshd_config
-RUN chown phpdevbox:phpdevbox /etc/ssh/ssh_config
-
-# supervisord config
-COPY conf/supervisord.conf /etc/supervisord.conf
-
 # php-fpm config
 COPY conf/php-fpm-phpdevbox.conf /usr/local/etc/php-fpm.d/php-fpm-phpdevbox.conf
 
@@ -228,7 +213,7 @@ RUN chmod +x /usr/local/bin/entrypoint.sh
 
 EXPOSE 80 22 443 5000 9000 44100
 
-WORKDIR /home/phpdevbox
+WORKDIR ${APP_ROOT}
 
 USER root
 

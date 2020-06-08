@@ -3,20 +3,8 @@ services:
   web:
     image: hectorrojas/phpdevbox:7.3-fpm
     volumes:
-      - "~/.composer:/home/phpdevbox/.composer"
       - ./var/log/apache2:/var/log/apache2:cached
       - ./webroot:/app:consistent
-    expose:
-      - "9000"
-    ports:
-      - "80:80"
-      - "443:443"
-      - "4022:22"
-    depends_on:
-      - db
-    extends: generic
-  generic:
-    image: alpine
     environment:
       - APP_ROOT=/app
       - PHP_MEMORY_LIMIT=4G
@@ -29,13 +17,21 @@ services:
       - XDEBUG_CONFIG=remote_host=host.docker.internal
       - ENABLE_SENDMAIL=true
       - 'PHP_EXTENSIONS=bcmath bz2 calendar exif gd gettext intl mysqli pcntl pdo_mysql soap sockets sysvmsg sysvsem sysvshm opcache zip redis xsl sodium xdebug'
+    expose:
+      - "9000"
+    ports:
+      - "80:80"
+      - "443:443"
+      - "4022:22"
+    depends_on:
+      - db
   db:
     image: mariadb:10.2
     volumes:
       - ./db/var/lib/mysql:/var/lib/mysql:cached
     environment:
-      - MYSQL_ROOT_PASSWORD=phpdevbox
-      - MYSQL_DATABASE=phpdevbox
+      - MYSQL_ROOT_PASSWORD=root
+      - MYSQL_DATABASE=application
       - MYSQL_USER=phpdevbox
       - MYSQL_PASSWORD=phpdevbox
     ports:

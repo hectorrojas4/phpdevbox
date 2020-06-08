@@ -24,6 +24,6 @@ fi
 # Override Apache config
 [ ! -z "${APP_ROOT}" ] && sed -i "s/APP_ROOT/${APP_ROOT}/" /etc/apache2/sites-enabled/apache-default.conf
 
+# Start Apache service
 service apache2 start
 
-supervisord -n -c /etc/supervisord.conf
