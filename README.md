@@ -1,6 +1,10 @@
 # phpdevbox
 PHP development environment using Docker with Debian and PHP 7.3-fpm
 
+## Create a new PHP project
+Create a new folder for your your project and copy the docker-compose.yml file into it.
+Change the *docker-compose* configuration according to your requirements, such as MEMORY_LIMIT, the project root, the volumes to be shared between your local and the container, and the PHP extensions you need.
+
 ## SSH to Docker Container
 
 ### To access the application container:
@@ -88,3 +92,8 @@ Open *Preferences -> Languages & Frameworks -> PHP -> Xdebug -> DBGp Proxy*:<br/
 IDE Key: `PHPSTORM`<br/>
 Host: `10.254.254.254`<br/>
 Port: `9000`<br/>
+
+Go to *Preferences -> Languages & Frameworks -> PHP -> Servers* and create a new Server:<br/>
+Host: `localhost`<br/>
+Port: `80`<br/>
+Use path mappings to map your project files to the absolute path on the server.<br/>
