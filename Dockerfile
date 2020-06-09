@@ -30,6 +30,7 @@ RUN apt-get update && apt-get upgrade -y && apt-get install -y --no-install-reco
     apache2 \
     sendmail-bin \
     sendmail \
+    supervisor \
     mariadb-client \
     default-mysql-client \
     libbz2-dev \
@@ -200,6 +201,9 @@ COPY conf/xdebug.ini /usr/local/etc/php/conf.d/xdebug-config.ini
 
 # Mail config
 COPY conf/mail.ini /usr/local/etc/php/conf.d/mail-config.ini
+
+# supervisord config
+COPY conf/supervisord.conf /etc/supervisord.conf
 
 # php-fpm config
 COPY conf/php-fpm-phpdevbox.conf /usr/local/etc/php-fpm.d/php-fpm-phpdevbox.conf
