@@ -28,8 +28,6 @@ RUN apt-get update && apt-get upgrade -y && apt-get install -y --no-install-reco
     cron \
     git \
     apache2 \
-    sendmail-bin \
-    sendmail \
     supervisor \
     mariadb-client \
     default-mysql-client \
@@ -189,6 +187,15 @@ RUN curl -sL https://deb.nodesource.com/setup_14.x | sudo -E bash - \
     && npm install npm@latest -g \
     && npm install -g grunt-cli && npm install -g gulp-cli
 
+# Install and configure Postfix
+RUN echo "postfix postfix/mailname string mail.example.com" | debconf-set-selections \
+    && echo "postfix postfix/main_mailer_type string 'Internet Site'" | debconf-set-selections \
+    && apt-get install --assume-yes postfix \
+    && postconf -e myhostname=mail.example.com \
+    && postconf -e mydestination="mail.example.com, example.com, localhost.localdomain, localhost" \
+    && postconf -e mail_spool_directory="/var/spool/mail/" \
+    && postconf -e mailbox_command=""
+
 # SSL certificate
 RUN mkdir /etc/apache2/ssl \
     && openssl req -x509 -nodes -days 365 -newkey rsa:2048 -keyout /etc/apache2/ssl/apache.key -out /etc/apache2/ssl/apache.crt -subj "/C=US/ST=New York/L=New York/O=PHPDEVBOX/CN=PHPDEVBOX"
@@ -198,9 +205,6 @@ COPY conf/php.ini /usr/local/etc/php/conf.d/php-config.ini
 
 # XDebug config
 COPY conf/xdebug.ini /usr/local/etc/php/conf.d/xdebug-config.ini
-
-# Mail config
-COPY conf/mail.ini /usr/local/etc/php/conf.d/mail-config.ini
 
 # supervisord config
 COPY conf/supervisord.conf /etc/supervisord.conf

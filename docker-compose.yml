@@ -4,6 +4,7 @@ services:
     image: hectorrojas/phpdevbox:7.3-fpm
     volumes:
       - ./var/log/apache2:/var/log/apache2:cached
+      - ./var/spool/mail/:/var/spool/mail/:cached
       - ./webroot:/app:consistent
     environment:
       - APP_ROOT=/app
@@ -13,9 +14,6 @@ services:
       - POST_MAX_SIZE=64M
       - GC_MAXLIFETIME=7200
       - LOG_ERRORS=1
-      - PHP_IDE_CONFIG=serverName=phpdevbox
-      - XDEBUG_CONFIG=remote_host=host.docker.internal
-      - ENABLE_SENDMAIL=true
       - 'PHP_EXTENSIONS=bcmath bz2 calendar exif gd gettext intl mysqli pcntl pdo_mysql soap sockets sysvmsg sysvsem sysvshm opcache zip redis xsl sodium xdebug'
     expose:
       - "9000"

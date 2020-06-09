@@ -1,10 +1,5 @@
 #!/bin/bash
 
-# Configure Sendmail if required
-if [ "$ENABLE_SENDMAIL" == "true" ]; then
-    /etc/init.d/sendmail start
-fi
-
 # Enable PHP extensions
 PHP_EXT_DIR=/usr/local/etc/php/conf.d
 PHP_EXT_ENABLE=docker-php-ext-enable
