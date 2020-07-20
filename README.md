@@ -1,9 +1,10 @@
 # phpdevbox
-PHP development environment using Docker with Debian and PHP 7.3-fpm
+PHP development environment using Docker with Debian and PHP 7.3-fpm.<br>
+The configuration of this Docker includes SSMTP and Mailhog to test the sending of emails in the local environment
 
 ## Create a new PHP project
-Create a new folder for your your project and copy the docker-compose.yml file into it.
-Change the *docker-compose* configuration according to your requirements, such as MEMORY_LIMIT, the project root, the volumes to be shared between your local and the container, and the PHP extensions you need.
+Create a new folder for your project and copy the docker-compose.yml file into it.
+Change the *docker-compose* configuration according to your requirements, such as MEMORY_LIMIT, project ROOT, volumes to be shared between your local and the container, and the PHP extensions you need.
 
 ## SSH to Docker Container
 
@@ -14,7 +15,7 @@ docker exec -it --user phpdevbox [CONTAINER_NAME] /bin/bash
 cd /app
 ```
 
-### Docker Credentials
+#### Docker Credentials
 User: `phpdevbox`<br/>
 Password: `phpdevbox`<br/>
 
@@ -24,7 +25,7 @@ Password: `phpdevbox`<br/>
 mysql -h 127.0.0.1 -P 3306 -u"root" -p"root"
 ```
 
-### Settings for MySQL Workbench
+#### Settings for MySQL Workbench
 
 Hostname: `127.0.0.1`<br/>
 Port: `3306`<br/>
@@ -33,6 +34,11 @@ Password: `root`<br/>
 
 ## XDEBUG
 The XDEBUG settings of the PHP image were created using a loopback alias:
+
+### Linux
+```
+sudo ifconfig lo:0 10.254.254.254 netmask 255.255.255.0 up
+```
 
 ### Mac
 ```
@@ -79,11 +85,6 @@ sudo chown root:wheel /Library/LaunchDaemons/com.network.alias.plist
 sudo launchctl load /Library/LaunchDaemons/com.network.alias.plist
 ```
 
-### Linux
-```
-sudo ifconfig lo:0 10.254.254.254 netmask 255.255.255.0 up
-```
-
 
 ### XDEBUG in PHPStorm
 *Preferences -> Languages & Frameworks -> PHP -> Xdebug* set `Debug port` to `9000` in the *Xdebug* section. 
@@ -97,3 +98,13 @@ Go to *Preferences -> Languages & Frameworks -> PHP -> Servers* and create a new
 Host: `localhost`<br/>
 Port: `80`<br/>
 Use path mappings to map your project files to the absolute path on the server.<br/>
+
+
+## MailHog
+This environment uses MailHog, an email testing tool for developers, that allows you to view outgoing emails without actually sending them to customers.
+
+### To access the web interface:
+In your web browser enter http://127.0.0.1:8025 or http://localhost:8025 and there you go!
+
+## Elasticsearch
+This environment includes the Elasticsearch container for Magento projects, if you don't need Elasticsearch in your project you should remove it from the docker-compose file.
