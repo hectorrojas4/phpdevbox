@@ -6,6 +6,15 @@ The configuration of this Docker includes SSMTP and Mailhog to test the sending 
 Create a new folder for your project and copy the docker-compose.yml file into it.
 Change the *docker-compose* configuration according to your requirements, such as MEMORY_LIMIT, project ROOT, volumes to be shared between your local and the container, and the PHP extensions you need.
 
+From you project root run the following command to create and start all the services configured in your `docker-compose.yml` configuration:
+
+```
+docker-compose up
+```
+
+Enter http://localhost/ or https://localhost/ in your web browser.<br>
+> If you want to use a custom URL and not localhost then you should map it to the file `/etc/hosts`
+
 ## SSH to Docker Container
 
 ### To access the application container:
