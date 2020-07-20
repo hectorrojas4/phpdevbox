@@ -4,7 +4,6 @@ services:
     image: hectorrojas/phpdevbox:7.3-fpm
     volumes:
       - ./var/log/apache2:/var/log/apache2:cached
-      - ./var/spool/mail/:/var/spool/mail/:cached
       - ./webroot:/app:consistent
     environment:
       - APP_ROOT=/app
@@ -34,6 +33,11 @@ services:
       - MYSQL_PASSWORD=phpdevbox
     ports:
       - "3306:3306"
+  mail:
+    image: mailhog/mailhog
+    ports:
+      - "1025:1025"
+      - "8025:8025"
   elasticsearch:
     image: hectorrojas/elasticsearch:6.5
     environment:

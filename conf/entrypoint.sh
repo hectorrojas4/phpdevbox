@@ -1,5 +1,8 @@
 #!/bin/bash
 
+# Create ROOT directory
+mkdir -p ${APP_ROOT}
+
 # Enable PHP extensions
 PHP_EXT_DIR=/usr/local/etc/php/conf.d
 PHP_EXT_ENABLE=docker-php-ext-enable
@@ -20,4 +23,3 @@ fi
 [ ! -z "${APP_ROOT}" ] && sed -i "s|APP_ROOT|${APP_ROOT}|g" /etc/apache2/sites-enabled/apache-default.conf
 
 supervisord -n -c /etc/supervisord.conf
-
