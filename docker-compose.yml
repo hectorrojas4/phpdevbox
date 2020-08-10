@@ -1,7 +1,7 @@
 version: '2'
 services:
   web:
-    image: hectorrojas/phpdevbox:7.3-fpm
+    image: hectorrojas/phpdevbox:7.1-fpm
     volumes:
       - ./var/log/apache2:/var/log/apache2:cached
       - ./webroot:/app:consistent
@@ -13,7 +13,7 @@ services:
       - POST_MAX_SIZE=64M
       - GC_MAXLIFETIME=7200
       - LOG_ERRORS=1
-      - 'PHP_EXTENSIONS=bcmath bz2 calendar exif gd gettext intl mysqli pcntl pdo_mysql soap sockets sysvmsg sysvsem sysvshm opcache zip redis xsl sodium xdebug'
+      - 'PHP_EXTENSIONS=bcmath bz2 calendar exif gd gettext intl mysqli pcntl pdo_mysql soap sockets sysvmsg sysvsem sysvshm opcache zip redis xsl xdebug'
     expose:
       - "9000"
     ports:
