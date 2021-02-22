@@ -130,6 +130,7 @@ RUN docker-php-ext-enable \
     bcmath \
     bz2 \
     calendar \
+    ctype \
     exif \
     gd \
     geoip \
@@ -150,7 +151,6 @@ RUN docker-php-ext-enable \
     propro \
     pspell \
     raphf \
-    recode \
     redis \
     shmop \
     soap \
