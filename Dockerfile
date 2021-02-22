@@ -1,4 +1,4 @@
-FROM php:7.3-fpm-stretch
+FROM php:7.4-fpm
 
 MAINTAINER "Hector Rojas"
 
@@ -27,8 +27,7 @@ RUN apt-get update && apt-get upgrade -y && apt-get install -y --no-install-reco
     bzip2 \
     cron \
     git \
-    mailutils \
-    ssmtp \
+    sendmail-bin \
     apache2 \
     supervisor \
     mariadb-client \
@@ -45,6 +44,7 @@ RUN apt-get update && apt-get upgrade -y && apt-get install -y --no-install-reco
     libkrb5-dev \
     libicu-dev \
     libldap2-dev \
+    libonig-dev \
     libpspell-dev \
     librecode0 \
     librecode-dev \
@@ -58,11 +58,11 @@ RUN apt-get update && apt-get upgrade -y && apt-get install -y --no-install-reco
 RUN rm -rf /var/lib/apt/lists/*
 
 # Configure gd
-RUN docker-php-ext-configure gd --with-freetype-dir=/usr/include/ --with-jpeg-dir=/usr/include/
+RUN docker-php-ext-configure gd --with-jpeg=/usr/include/ --with-freetype=/usr/include/
 RUN docker-php-ext-configure imap --with-kerberos --with-imap-ssl
 RUN docker-php-ext-configure ldap --with-libdir=lib/x86_64-linux-gnu
 RUN docker-php-ext-configure opcache --enable-opcache
-RUN docker-php-ext-configure zip --with-libzip
+RUN docker-php-ext-configure zip
 RUN docker-php-ext-configure hash --with-mhash
 
 # PHP extensions
@@ -70,6 +70,7 @@ RUN docker-php-ext-install -j$(nproc) \
     bcmath \
     bz2 \
     calendar \
+    ctype \
     exif \
     gd \
     gettext \
@@ -79,14 +80,13 @@ RUN docker-php-ext-install -j$(nproc) \
     intl \
     json \
     ldap \
-    mysqli \
     mbstring \
+    mysqli \
     opcache \
     pcntl \
     pdo \
     pdo_mysql \
     pspell \
-    recode \
     shmop \
     simplexml \
     soap \
@@ -193,11 +193,21 @@ RUN curl -sL https://deb.nodesource.com/setup_14.x | sudo -E bash - \
 RUN mkdir /etc/apache2/ssl \
     && openssl req -x509 -nodes -days 365 -newkey rsa:2048 -keyout /etc/apache2/ssl/apache.key -out /etc/apache2/ssl/apache.crt -subj "/C=US/ST=New York/L=New York/O=PHPDEVBOX/CN=PHPDEVBOX"
 
+# Install Postfix
+run echo "postfix postfix/main_mailer_type string Internet site" > preseed.txt
+run echo "postfix postfix/mailname string mail.example.com" >> preseed.txt
+run debconf-set-selections preseed.txt
+run DEBIAN_FRONTEND=noninteractive apt-get install -q -y postfix
+run postconf -e myhostname=mail.example.com
+run postconf -e mydestination="mail.example.com, example.com, localhost.localdomain, localhost"
+run postconf -e mail_spool_directory="/var/spool/mail/"
+run postconf -e mailbox_command=""
+
+# Postfix config
+COPY conf/postfix-main.cf /etc/postfix/main.cf
+
 # PHP config
 COPY conf/php.ini /usr/local/etc/php/conf.d/php-config.ini
-
-# SSMTP config
-COPY conf/ssmtp.conf /etc/ssmtp/ssmtp.conf
 
 # XDebug config
 COPY conf/xdebug.ini /usr/local/etc/php/conf.d/xdebug-config.ini
