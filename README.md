@@ -1,6 +1,6 @@
 # phpdevbox
-PHP development environment using Docker with Debian and PHP 7.3-fpm.<br>
-The configuration of this Docker includes SSMTP and Mailhog to test the sending of emails in the local environment
+PHP development environment using Docker with Debian and PHP 7.4-fpm.<br>
+The configuration of this Docker includes Postfix and Mailhog to test the sending of emails in the local environment
 
 ## Create a new PHP project
 Create a new folder for your project and copy the docker-compose.yml file into it.
