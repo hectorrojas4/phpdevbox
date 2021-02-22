@@ -104,7 +104,8 @@ Host: `10.254.254.254`<br/>
 Port: `9000`<br/>
 
 Go to *Preferences -> Languages & Frameworks -> PHP -> Servers* and create a new Server:<br/>
-Host: `localhost`<br/>
+Name: `Docker`<br/>
+Host: `localhost` or `127.0.0.1`<br/>
 Port: `80`<br/>
 Use path mappings to map your project files to the absolute path on the server.<br/>
 

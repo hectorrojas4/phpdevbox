@@ -1,10 +1,7 @@
 version: '2'
 services:
-  web:
-    image: hectorrojas/phpdevbox:7.3-fpm
-    volumes:
-      - ./var/log/apache2:/var/log/apache2:cached
-      - ./webroot:/app:consistent
+  generic:
+    image: alpine
     environment:
       - APP_ROOT=/app
       - PHP_MEMORY_LIMIT=4G
@@ -13,7 +10,14 @@ services:
       - POST_MAX_SIZE=64M
       - GC_MAXLIFETIME=7200
       - LOG_ERRORS=1
+      - PHP_IDE_CONFIG=serverName=Docker
       - 'PHP_EXTENSIONS=bcmath bz2 calendar exif gd gettext intl mysqli pcntl pdo_mysql soap sockets sysvmsg sysvsem sysvshm opcache zip redis xsl sodium xdebug'
+  web:
+    image: hectorrojas/phpdevbox:7.3-fpm
+    volumes:
+      - ~/.composer:/home/phpdevbox/.composer:cached
+      - ./var/log/apache2:/var/log/apache2:delegated
+      - ./webroot:/app:consistent
     expose:
       - "9000"
     ports:
@@ -22,10 +26,11 @@ services:
       - "4022:22"
     depends_on:
       - db
+    extends: generic
   db:
     image: mariadb:10.2
     volumes:
-      - ./db/var/lib/mysql:/var/lib/mysql:cached
+      - ./db/var/lib/mysql:/var/lib/mysql:delegated
     environment:
       - MYSQL_ROOT_PASSWORD=root
       - MYSQL_DATABASE=application
@@ -35,6 +40,7 @@ services:
       - "3306:3306"
   mail:
     image: mailhog/mailhog
+    command: ['-storage=maildir', '-maildir-path=/home/mailhog/maildir']
     ports:
       - "1025:1025"
       - "8025:8025"
@@ -43,5 +49,5 @@ services:
     environment:
       ES_JAVA_OPTS: "-Xms750m -Xmx750m"
     ports:
-          - "9200:9200"
-          - "9300:9300"
+      - "9200:9200"
+      - "9300:9300"
