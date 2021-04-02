@@ -2,6 +2,11 @@
 PHP development environment using Docker with Debian and PHP 7.1.24-fpm
 
 ## SSH to Docker Container
+You can connect using the following command:
+```
+docker exec -it --user phpdevbox [container_name] /bin/bash
+```
+
 To access to the docker container using ssh you can add a loopback alias:
 #### Mac
 ```
