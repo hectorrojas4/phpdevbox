@@ -13,7 +13,7 @@ services:
       - PHP_IDE_CONFIG=serverName=Docker
       - 'PHP_EXTENSIONS=bcmath bz2 calendar exif gd gettext intl mysqli pcntl pdo_mysql soap sockets sysvmsg sysvsem sysvshm opcache zip redis xsl sodium xdebug'
   web:
-    image: hectorrojas/phpdevbox:7.3-fpm
+    image: hectorrojas/phpdevbox:7.2-fpm
     volumes:
       - ~/.composer:/home/phpdevbox/.composer:cached
       - ./var/log/apache2:/var/log/apache2:delegated

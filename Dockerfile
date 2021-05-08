@@ -1,4 +1,4 @@
-FROM php:7.4-fpm
+FROM php:7.2-fpm
 
 MAINTAINER "Hector Rojas"
 
@@ -58,11 +58,11 @@ RUN apt-get update && apt-get upgrade -y && apt-get install -y --no-install-reco
 RUN rm -rf /var/lib/apt/lists/*
 
 # Configure gd
-RUN docker-php-ext-configure gd --with-jpeg=/usr/include/ --with-freetype=/usr/include/
+RUN docker-php-ext-configure gd --with-freetype-dir=/usr/include/ --with-jpeg-dir=/usr/include/
 RUN docker-php-ext-configure imap --with-kerberos --with-imap-ssl
 RUN docker-php-ext-configure ldap --with-libdir=lib/x86_64-linux-gnu
 RUN docker-php-ext-configure opcache --enable-opcache
-RUN docker-php-ext-configure zip
+RUN docker-php-ext-configure zip --with-libzip
 RUN docker-php-ext-configure hash --with-mhash
 
 # PHP extensions
@@ -87,6 +87,7 @@ RUN docker-php-ext-install -j$(nproc) \
     pdo \
     pdo_mysql \
     pspell \
+    recode \
     shmop \
     simplexml \
     soap \
